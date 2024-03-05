@@ -53,3 +53,34 @@ Route::get('/', function () {
 ```
 - Kết quả:
 - ![image](https://github.com/VTN277/DOCS/assets/67737894/889f5445-45ee-49a7-bd7d-58b3b90f3cc5)
+### Kế thừa layout
+- resources/views/layouts/app.blade.php
+```
+<head>
+    <title>App Name - @yield('title')</title>
+</head>
+<body>
+  @section('sidebar')
+      This is the master sidebar.
+  @endsection
+  <div class="container">
+      @yield('content')
+  </div>
+</body>
+```
+- resources/views/home.blade.php
+```
+@extends('layouts.app')
+
+@section('title', 'Page Title')
+
+@section('sidebar')
+    @parent
+
+    <p>This is appended to the master sidebar.</p>
+@endsection
+
+@section('content')
+    <p>This is my body content.</p>
+@endsection
+```

@@ -1,4 +1,9 @@
 ### Variables
+```
+var name = 'Bob'; 
+//tyer of the name variable inferred to a String object
+String name = 'Bob'
+```
 #### 1. Null safety
 ```
 String? name  // Nullable type. Can be `null` or string.

@@ -112,3 +112,4 @@ String playerName(String? name) => name ?? 'Guest';
   button?.onClick.listen((e) => window.alert('Confirmed!'));
   button?.scrollIntoView();
 ```
+#### 6. Spread operators

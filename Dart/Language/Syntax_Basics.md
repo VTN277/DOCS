@@ -27,7 +27,7 @@ if (weLikeToCount) {
 //lineCount luc nay co gia tri
 print(lineCount);
 ```
-### 3. Late variables
+#### 3. Late variables
 - Useful in these cases:
   + The value of the variable is not available at the time of declaration
   + Delay variable initialization until the variable is used to optimize performance
@@ -52,4 +52,4 @@ void main() {
   print(user.greet()); // print: Xin chào, Alice!
 }
 ```  
-### 4. Final and const
+#### 4. Final and const

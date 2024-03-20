@@ -60,13 +60,13 @@ ___
 
 ## Operators
 #### 1. Arithmetic
-| Operator          | Meaning                          |
-| :---------------- | :------------------------------: |
-| -expr             | reverse the sign of expresstion  |
-| ~/                | devide, returning integer resutl |
+| Operator          | Meaning                           |
+| :---------------- | :------------------------------:  |
+| -expr             | reverse the sign of expresstion   |
+| ~/                | devide, returning integer resutlt |
 #### 2.Type test operators
-| Operator          | Meaning                          |
-| :---------------- | :------------------------------: |
+| Operator          | Meaning                                           |
+| :---------------- | :-----------------------------------------------: |
 | is                | True if the object have the specified type        |
 | is!               | True if the object doesn't have the specifed type |
 ```

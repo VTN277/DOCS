@@ -57,7 +57,6 @@
 - **const**: it's value assigned at compile time
 - **final**: it's value assigned at runtime
 ___
-___
 
 ## Operators
 #### 1. Arithmetic

@@ -102,3 +102,7 @@ ___
   print(point == color); // Prints 'false'. Lint: Equals on unrelated types.
 ```
 ### 5. Multiple returns
+___
+
+## Collections
+#### 1. Lists

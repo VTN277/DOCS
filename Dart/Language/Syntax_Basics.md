@@ -105,10 +105,10 @@ String playerName(String? name) => name ?? 'Guest';
 ```
 - null-coalescing with `?..`
 ```
-  var button = querySelector('#confirm');
-  button?.text = 'Confirm';
-  button?.classes.add('important');
-  button?.onClick.listen((e) => window.alert('Confirmed!'));
-  button?.scrollIntoView();
+  querySelector('#confirm') // Get an object.
+    ?..text = 'Confirm' // Use its members.
+    ..classes.add('important')
+    ..onClick.listen((e) => window.alert('Confirmed!'))
+    ..scrollIntoView();
 ```
 #### 6. Spread operators

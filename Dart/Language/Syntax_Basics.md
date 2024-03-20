@@ -112,3 +112,43 @@ String playerName(String? name) => name ?? 'Guest';
     ..scrollIntoView();
 ```
 #### 6. Spread operators
+___
+
+## Metadata
+- usage: to give additional information about your code
+-  @Deprecated, @deprecated, @override, and @pragma
+___
+
+## Libraries & imports
+#### 1. Using libraries
+```
+  //build-int librariese using dart:
+  import 'dart:html';
+
+  //other using package
+  import 'package:test/test.dart';
+```
+#### 2. Specifying a library prefix
+```
+  import 'package:lib1/lib1.dart';
+  import 'package:lib2/lib2.dart' as lib2;
+
+  // Uses Element from lib1.
+  Element element1 = Element();
+
+  // Uses Element from lib2.
+  lib2.Element element2 = lib2.Element();
+```
+```
+// Import only foo.
+import 'package:lib1/lib1.dart' show foo;
+
+// Import all names EXCEPT foo.
+import 'package:lib2/lib2.dart' hide foo;
+```
+#### Lazily loading a library (Flutter and the Dart VM don't support deferred loading)
+- *Deferred loading* (also called *lazy loading*) allows a wab app to loading a library on demain, if and when the library is nedded
+- Used cases:
+  + reduce startup time
+  + testing
+  + to load rarely used functionally

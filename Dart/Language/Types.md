@@ -106,3 +106,20 @@ ___
 
 ## Collections
 #### 1. Lists
+```
+var list = [1, 2, 3]
+assert(list.length == 3)
+assert(list[1] == 2)
+```
+- create a list that's a compile-time constant
+```
+var constantList = const[1, 2, 3];
+//constantList[1] = 1; // this line will cause error
+```
+#### 2. Set
+- is an unorder collection with unique items
+```
+var names = <String>{};
+//Set<string> name {} //This work too
+//var name = {}; //create a map not a set
+```

@@ -46,7 +46,7 @@
     }
   }
 
-  void main() {
+  void main() { 
     var user = User();
     user.setName("Alice");
     print(user.greet()); // print: Xin chào, Alice!

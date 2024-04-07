@@ -9,8 +9,8 @@
 - Runes (Runes; often replaceed by the characters API)
 - Symbols (Symbol)
 - The value of null (Null)
-#### 1. Numbers
-#### 2. Strings
+### 1. Numbers
+### 2. Strings
 - multi-line string
 ```
   var s1 = '''
@@ -22,7 +22,7 @@
 ```
   var s = r'In a raw string, not even \n gets special treatment.';
 ```
-#### 3. Booleans
+### 3. Booleans
 - Dart's type safety means that you can't use code like `if (nonbooleanvalue)` or `assert(nonbooeleanvalue)`
 ```
   // Check for an empty string.
@@ -41,13 +41,13 @@
   var iMeantToDoThis = 0 / 0;
   assert(iMeantToDoThis.isNaN);
 ```
-#### 4. Runes and grapheme clusters
-#### 5. Symbols
+### 4. Runes and grapheme clusters
+### 5. Symbols
 ___
 
 ## Records
 - similar to struct
-#### 1. Record syntax
+### 1. Record syntax
 - Key characteristics of Records:
   + Anonymous: Unlike class that have a predefinded name, records are defined line without specific name.
   + Immutable: Once created, the value within a record can not be changed

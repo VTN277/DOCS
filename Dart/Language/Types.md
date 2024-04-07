@@ -123,3 +123,39 @@ var names = <String>{};
 //Set<string> name {} //This work too
 //var name = {}; //create a map not a set
 ```
+```
+var elements = <String>{};
+elements.add('fluorine');
+elements.addAll(halogens);
+assert(elements.length == 5);
+```
+- To create a set that's a compile-time constant
+```
+final constantSet = const {
+  'fluorine',
+  'chlorine',
+  'bromine',
+  'iodine',
+  'astatine',
+};
+// constantSet.add('helium'); // This line will cause an error.
+```
+#### 3. Map
+```
+var gifts = {
+  // Key:    Value
+  'first': 'partridge',
+  'second': 'turtledoves',
+  'fifth': 'golden rings'
+};
+```
+```
+var gifts = Map<String, String>();
+gifts['first'] = 'partridge';
+gifts['second'] = 'turtledoves';
+gifts['fifth'] = 'golden rings';
+```
+```
+var gifts = {'first': 'partridge'};
+gifts['fourth'] = 'calling birds'; // Add a key-value pair
+```

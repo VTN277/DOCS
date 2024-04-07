@@ -71,4 +71,99 @@ switch (pair) {
 #### For and for-in loops
 ___
 
-## Use cases for patterns
+## 4.Use cases for patterns
+### Destructuring multiple returns
+```
+var info = userInfo(json);
+var name = info.$1;
+var age = info.$2;
+```
+```
+var (name, age) = userInfo(json);
+```
+### Destructuring class instances
+```
+final Foo myFoo = Foo(one: 'one', two: 2);
+var Foo(:one, :two) = myFoo;
+print('one $one, two $two');
+```
+### Algebraic data types
+```
+sealed class Shape {}
+
+class Square implements Shape {
+  final double length;
+  Square(this.length);
+}
+
+class Circle implements Shape {
+  final double radius;
+  Circle(this.radius);
+}
+
+double calculateArea(Shape shape) => switch (shape) {
+      Square(length: var l) => l * l,
+      Circle(radius: var r) => math.pi * r * r
+    };
+```
+### Validating incoming JSON
+```
+var json = {
+  'user': ['Lily', 13]
+};
+var {'user': [name, age]} = json;
+```
+___
+
+## Pattern types
+### 1. Logical-or
+```
+var isPrimary = switch (color) {
+  Color.red || Color.yellow || Color.blue => true,
+  _ => false
+};
+```
+### 2. Logical-and
+```
+switch ((1, 2)) {
+  // Error, both subpatterns attempt to bind 'b'.
+  case (var a, var b) && (var b, var c): // ...
+}
+```
+### 3. Relational
+```
+String asciiCharType(int char) {
+  const space = 32;
+  const zero = 48;
+  const nine = 57;
+
+  return switch (char) {
+    < space => 'control',
+    == space => 'space',
+    > space && < zero => 'punctuation',
+    >= zero && <= nine => 'digit',
+    _ => ''
+  };
+}
+```
+### 4. Cast
+```
+(num, Object) record = (1, 's');
+var (i as int, s as String) = record;
+```
+### 5. Null-check
+```
+String? maybeString = 'nullable with base type String';
+switch (maybeString) {
+  case var s?:
+  // 's' has type non-nullable String here.
+}
+```
+### 6. Null-assert
+```
+List<String?> row = ['user', null];
+switch (row) {
+  case ['user', var name!]: // ...
+  // 'name' is a non-nullable string here.
+}
+```

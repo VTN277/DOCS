@@ -185,3 +185,55 @@ var listOfStrings = ['#0', for (var i in listOfInts) '#$i'];
 assert(listOfStrings[1] == '#1');
 
 ```
+___
+
+## Generics
+### 1. Using collection literals
+```
+//list
+var names = <String>['Seth', 'Kathy', 'Lars'];
+//set
+var uniqueNames = <String>{'Seth', 'Kathy', 'Lars'};
+//map
+var pages = <String, String>{
+  'index.html': 'Homepage',
+  'robots.txt': 'Hints for web robots',
+  'humans.txt': 'We are people, not machines'
+};
+```
+### 2. Using parameterized types with constructors (su dung cac kieu duoc tham so hoa voi ham tao)
+```
+var nameSet = Set<String>.from(names);
+```
+```
+var views = Map<int, View>();
+```
+### 3.Generic collections and the types they contain (lay ra type cua bien)
+```
+var names = <String>[];
+names.addAll(['Seth', 'Kathy', 'Lars']);
+print(names is List<String>); // true
+```
+### 4. Restricting the parameterized type (han che loai tham so)
+```
+// Lớp Box sử dụng Generics để lưu trữ một giá trị bất kỳ
+class Box<T> {
+  T value;
+
+  Box(this.value);
+
+  void printValue() {
+    print(value);
+  }
+}
+
+void main() {
+  // Tạo một Box để lưu trữ một số nguyên
+  var integerBox = Box<int>(10);
+  integerBox.printValue(); // Output: 10
+
+  // Tạo một Box để lưu trữ một chuỗi
+  var stringBox = Box<String>('Hello, Dart!');
+  stringBox.printValue(); // Output: Hello, Dart!
+}
+```

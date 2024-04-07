@@ -237,3 +237,28 @@ void main() {
   stringBox.printValue(); // Output: Hello, Dart!
 }
 ```
+### 5. Using generic methods
+```
+// Generic method to print any type of list
+void printList<T>(List<T> list) {
+  for (var item in list) {
+    print(item);
+  }
+}
+```
+```
+// Generic method to find the maximum element in a list
+T findMax<T extends Comparable>(List<T> list) {
+  if (list.isEmpty) {
+    throw Exception('List is empty');
+  }
+
+  var max = list[0];
+  for (var item in list) {
+    if (item.compareTo(max) > 0) {
+      max = item;
+    }
+  }
+  return max;
+}
+```

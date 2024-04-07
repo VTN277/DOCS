@@ -140,7 +140,7 @@ final constantSet = const {
 };
 // constantSet.add('helium'); // This line will cause an error.
 ```
-#### 3. Map
+#### 3. Maps
 ```
 var gifts = {
   // Key:    Value
@@ -158,4 +158,30 @@ gifts['fifth'] = 'golden rings';
 ```
 var gifts = {'first': 'partridge'};
 gifts['fourth'] = 'calling birds'; // Add a key-value pair
+```
+#### 4.Operators
+##### 4.1 Spread operator
+```
+var list = [1, 2, 3];
+var list2 = [0, ...list];
+assert(list2.length = 5);
+```
+```
+var list2 = [0, ...?list];
+assert(list2.length == 1);
+```
+##### 4.2 Control-flow operators (toan tu dieu khien luong)
+- collection if
+```
+var nav = ['Home', 'Furniture', 'Plants', if (promoActive) 'Outlet'];
+```
+```
+var nav = ['Home', 'Furniture', 'Plants', if (login case 'Manager') 'Inventory'];
+```
+- collection for
+```
+var listOfInts = [1, 2, 3];
+var listOfStrings = ['#0', for (var i in listOfInts) '#$i'];
+assert(listOfStrings[1] == '#1');
+
 ```

@@ -105,7 +105,7 @@ ___
 ___
 
 ## Collections
-#### 1. Lists
+### 1. Lists
 ```
 var list = [1, 2, 3]
 assert(list.length == 3)
@@ -116,7 +116,7 @@ assert(list[1] == 2)
 var constantList = const[1, 2, 3];
 //constantList[1] = 1; // this line will cause error
 ```
-#### 2. Set
+### 2. Set
 - is an unorder collection with unique items
 ```
 var names = <String>{};
@@ -140,7 +140,7 @@ final constantSet = const {
 };
 // constantSet.add('helium'); // This line will cause an error.
 ```
-#### 3. Maps
+### 3. Maps
 ```
 var gifts = {
   // Key:    Value
@@ -159,8 +159,8 @@ gifts['fifth'] = 'golden rings';
 var gifts = {'first': 'partridge'};
 gifts['fourth'] = 'calling birds'; // Add a key-value pair
 ```
-#### 4.Operators
-##### 4.1 Spread operator
+### 4.Operators
+#### 4.1 Spread operator
 ```
 var list = [1, 2, 3];
 var list2 = [0, ...list];
@@ -170,7 +170,7 @@ assert(list2.length = 5);
 var list2 = [0, ...?list];
 assert(list2.length == 1);
 ```
-##### 4.2 Control-flow operators (toan tu dieu khien luong)
+#### 4.2 Control-flow operators (toan tu dieu khien luong)
 - collection if
 ```
 var nav = ['Home', 'Furniture', 'Plants', if (promoActive) 'Outlet'];

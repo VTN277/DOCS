@@ -1,10 +1,10 @@
 # Hướng dẫn chi tiết về Modal Verbs trong tiếng Anh
 
-Modal verbs là một phần quan trọng của ngữ pháp tiếng Anh, giúp chúng ta thể hiện các khái niệm như khả năng, sự cho phép, nghĩa vụ, xác suất và các ý nghĩa khác.
+Giúp chúng ta thể hiện các khái niệm như khả năng, sự cho phép, nghĩa vụ, xác suất và các ý nghĩa khác.
 
 ## 1. Cấu trúc cơ bản
 
-Modal verb + động từ nguyên mẫu (không "to")
+Modal verb + v_base (không "to")
 
 Ví dụ: can go, must eat, should study
 

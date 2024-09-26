@@ -10,9 +10,9 @@ There are four main types of conditional sentences in English, each serving a di
 
 ### 1. Zero Conditional
 
-**Purpose**: To express general truths or scientific facts.
-**Structure**: If + present simple, present simple
-**Example**: If you heat water to 100°C, it boils.
+**Purpose**: To express general truths or scientific facts.\
+**Structure**: If + present simple, present simple\
+**Example**: If you heat water to 100°C, it boils.\
 
 More examples:
 - If plants don't get water, they die.
@@ -20,9 +20,9 @@ More examples:
 
 ### 2. First Conditional
 
-**Purpose**: To talk about possible future situations and their likely results.
-**Structure**: If + present simple, will + infinitive
-**Example**: If it rains tomorrow, I will stay at home.
+**Purpose**: To talk about possible future situations and their likely results.\
+**Structure**: If + present simple, will + infinitive\
+**Example**: If it rains tomorrow, I will stay at home.\
 
 The first conditional is used for real and possible situations in the future. It's often used to make predictions or talk about likely consequences.
 
@@ -32,9 +32,9 @@ More examples:
 
 ### 3. Second Conditional
 
-**Purpose**: To talk about unreal, unlikely, or hypothetical situations in the present or future.
-**Structure**: If + past simple, would + infinitive
-**Example**: If I won the lottery, I would buy a house.
+**Purpose**: To talk about unreal, unlikely, or hypothetical situations in the present or future.\
+**Structure**: If + past simple, would + infinitive\
+**Example**: If I won the lottery, I would buy a house.\
 
 The second conditional is used for imaginary situations that are unlikely to happen or impossible. It's often used to give advice or talk about dreams and wishes.
 
@@ -44,9 +44,9 @@ More examples:
 
 ### 4. Third Conditional
 
-**Purpose**: To talk about unreal situations in the past (things that didn't happen).
-**Structure**: If + past perfect, would have + past participle
-**Example**: If I had studied harder, I would have passed the exam.
+**Purpose**: To talk about unreal situations in the past (things that didn't happen).\
+**Structure**: If + past perfect, would have + past participle\
+**Example**: If I had studied harder, I would have passed the exam.\
 
 The third conditional is used to express regret or to talk about how things could have been different in the past.
 

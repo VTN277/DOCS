@@ -1,323 +1,60 @@
-# In-Depth Guide to Dockerfiles for NestJS Applications
+# NestJS Dockerfile Cheatsheet
 
-## 1. Introduction to Dockerizing NestJS Applications
+This cheatsheet provides a comprehensive guide to creating Dockerfiles for NestJS applications, including common use cases and examples.
 
-NestJS is a progressive Node.js framework for building efficient and scalable server-side applications. Dockerizing NestJS applications allows for consistent development, testing, and deployment across different environments.
-
-## 2. Basic NestJS Dockerfile
-
-Let's start with a basic Dockerfile for a NestJS application:
+## Basic Dockerfile Structure
 
 ```dockerfile
-# Use Node.js as the base image
+# Base image
 FROM node:14
 
-# Set the working directory
+# Create app directory
 WORKDIR /usr/src/app
 
-# Copy package.json and package-lock.json
+# Install app dependencies
 COPY package*.json ./
-
-# Install dependencies
 RUN npm install
 
-# Copy the rest of the application code
+# Bundle app source
 COPY . .
 
-# Build the application
+# Build the app
 RUN npm run build
 
-# Expose the port the app runs on
+# Expose port
 EXPOSE 3000
 
-# Command to run the application
-CMD ["npm", "run", "start:prod"]
+# Start the app
+CMD [ "node", "dist/main" ]
 ```
 
-This Dockerfile:
-1. Uses Node.js 14 as the base image
-2. Sets the working directory
-3. Copies package files and installs dependencies
-4. Copies the rest of the application code
-5. Builds the application
-6. Exposes port 3000
-7. Specifies the command to run the production build
+## Use Cases and Examples
 
-## 3. Multi-Stage Build for Smaller Production Images
+### 1. Development Environment
 
-For a more optimized production image, we can use a multi-stage build:
+Use case: Setting up a development environment with hot-reloading.
 
 ```dockerfile
-# Build stage
+FROM node:14
+
+WORKDIR /usr/src/app
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+
+EXPOSE 3000
+
+CMD [ "npm", "run", "start:dev" ]
+```
+
+### 2. Production Environment
+
+Use case: Optimizing for a production environment.
+
+```dockerfile
 FROM node:14 AS builder
-
-WORKDIR /usr/src/app
-
-COPY package*.json ./
-RUN npm install
-
-COPY . .
-RUN npm run build
-
-# Production stage
-FROM node:14-alpine
-
-WORKDIR /usr/src/app
-
-COPY --from=builder /usr/src/app/dist ./dist
-COPY --from=builder /usr/src/app/node_modules ./node_modules
-
-EXPOSE 3000
-
-CMD ["node", "dist/main"]
-```
-
-This Dockerfile:
-1. Uses a full Node.js image to build the application
-2. Copies only the built application and production dependencies to a smaller Alpine-based image
-3. Results in a significantly smaller production image
-
-## 4. Development vs. Production Dockerfile
-
-### Development Dockerfile
-
-```dockerfile
-FROM node:14
-
-WORKDIR /usr/src/app
-
-COPY package*.json ./
-RUN npm install
-
-COPY . .
-
-EXPOSE 3000
-
-CMD ["npm", "run", "start:dev"]
-```
-
-### Production Dockerfile
-
-```dockerfile
-FROM node:14-alpine AS builder
-
-WORKDIR /usr/src/app
-
-COPY package*.json ./
-RUN npm install
-
-COPY . .
-RUN npm run build
-
-FROM node:14-alpine
-
-WORKDIR /usr/src/app
-
-COPY --from=builder /usr/src/app/dist ./dist
-COPY --from=builder /usr/src/app/node_modules ./node_modules
-
-EXPOSE 3000
-
-CMD ["node", "dist/main"]
-```
-
-Use `docker-compose.yml` to manage both environments:
-
-```yaml
-version: '3'
-services:
-  nestjs-app:
-    build:
-      context: .
-      dockerfile: ${DOCKERFILE:-Dockerfile.prod}
-    ports:
-      - "3000:3000"
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
-    environment:
-      - NODE_ENV=${NODE_ENV:-production}
-```
-
-Run development environment:
-```
-DOCKERFILE=Dockerfile.dev NODE_ENV=development docker-compose up
-```
-
-Run production environment:
-```
-docker-compose up
-```
-
-## 5. Use Cases and Examples
-
-### Use Case 1: NestJS with TypeORM and PostgreSQL
-
-```dockerfile
-FROM node:14-alpine AS builder
-
-WORKDIR /usr/src/app
-
-COPY package*.json ./
-RUN npm install
-
-COPY . .
-RUN npm run build
-
-FROM node:14-alpine
-
-WORKDIR /usr/src/app
-
-COPY --from=builder /usr/src/app/dist ./dist
-COPY --from=builder /usr/src/app/node_modules ./node_modules
-
-# Install PostgreSQL client
-RUN apk add --no-cache postgresql-client
-
-EXPOSE 3000
-
-CMD ["node", "dist/main"]
-```
-
-Docker Compose file (`docker-compose.yml`):
-
-```yaml
-version: '3'
-services:
-  nestjs-app:
-    build: .
-    ports:
-      - "3000:3000"
-    environment:
-      - DATABASE_HOST=postgres
-      - DATABASE_PORT=5432
-      - DATABASE_USER=postgres
-      - DATABASE_PASSWORD=password
-      - DATABASE_NAME=mydatabase
-    depends_on:
-      - postgres
-
-  postgres:
-    image: postgres:13
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=mydatabase
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
-
-volumes:
-  postgres-data:
-```
-
-### Use Case 2: NestJS with MongoDB and Redis
-
-```dockerfile
-FROM node:14-alpine AS builder
-
-WORKDIR /usr/src/app
-
-COPY package*.json ./
-RUN npm install
-
-COPY . .
-RUN npm run build
-
-FROM node:14-alpine
-
-WORKDIR /usr/src/app
-
-COPY --from=builder /usr/src/app/dist ./dist
-COPY --from=builder /usr/src/app/node_modules ./node_modules
-
-EXPOSE 3000
-
-CMD ["node", "dist/main"]
-```
-
-Docker Compose file (`docker-compose.yml`):
-
-```yaml
-version: '3'
-services:
-  nestjs-app:
-    build: .
-    ports:
-      - "3000:3000"
-    environment:
-      - MONGODB_URI=mongodb://mongo:27017/mydatabase
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-    depends_on:
-      - mongo
-      - redis
-
-  mongo:
-    image: mongo:4.4
-    volumes:
-      - mongo-data:/data/db
-
-  redis:
-    image: redis:6-alpine
-    volumes:
-      - redis-data:/data
-
-volumes:
-  mongo-data:
-  redis-data:
-```
-
-### Use Case 3: NestJS with GraphQL
-
-```dockerfile
-FROM node:14-alpine AS builder
-
-WORKDIR /usr/src/app
-
-COPY package*.json ./
-RUN npm install
-
-COPY . .
-RUN npm run build
-
-FROM node:14-alpine
-
-WORKDIR /usr/src/app
-
-COPY --from=builder /usr/src/app/dist ./dist
-COPY --from=builder /usr/src/app/node_modules ./node_modules
-
-EXPOSE 3000
-
-CMD ["node", "dist/main"]
-```
-
-For GraphQL, you don't need to change the Dockerfile, but you might want to add a volume for schema persistence in your `docker-compose.yml`:
-
-```yaml
-version: '3'
-services:
-  nestjs-graphql-app:
-    build: .
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./src/schema.gql:/usr/src/app/dist/schema.gql
-```
-
-## 6. Best Practices for NestJS Dockerfiles
-
-1. Use multi-stage builds to keep production images small.
-2. Leverage Docker layer caching by copying package files and installing dependencies before copying the rest of the code.
-3. Use environment variables for configuration to make your Dockerfile more flexible.
-4. Include only necessary files in your Docker build context using `.dockerignore`.
-5. Run your NestJS application as a non-root user for better security.
-6. Use health checks to ensure your application is running correctly.
-
-Example with best practices:
-
-```dockerfile
-FROM node:14-alpine AS builder
 
 WORKDIR /usr/src/app
 
@@ -325,6 +62,7 @@ COPY package*.json ./
 RUN npm ci
 
 COPY . .
+
 RUN npm run build
 
 FROM node:14-alpine
@@ -334,19 +72,125 @@ WORKDIR /usr/src/app
 COPY --from=builder /usr/src/app/dist ./dist
 COPY --from=builder /usr/src/app/node_modules ./node_modules
 
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S nestjs -u 1001
+EXPOSE 3000
 
-USER nestjs
+CMD [ "node", "dist/main" ]
+```
+
+### 3. Multi-stage Build with Testing
+
+Use case: Including testing in the build process.
+
+```dockerfile
+FROM node:14 AS builder
+
+WORKDIR /usr/src/app
+
+COPY package*.json ./
+RUN npm ci
+
+COPY . .
+
+RUN npm run test
+RUN npm run build
+
+FROM node:14-alpine
+
+WORKDIR /usr/src/app
+
+COPY --from=builder /usr/src/app/dist ./dist
+COPY --from=builder /usr/src/app/node_modules ./node_modules
 
 EXPOSE 3000
 
-HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-  CMD node healthcheck.js
-
-CMD ["node", "dist/main"]
+CMD [ "node", "dist/main" ]
 ```
 
-This Dockerfile incorporates several best practices, including using a non-root user and adding a health check.
+### 4. Using Environment Variables
 
-By understanding these examples and use cases, you can create efficient, secure, and maintainable Dockerfiles for your NestJS applications across various scenarios and deployment needs.
+Use case: Configuring the app using environment variables.
+
+```dockerfile
+FROM node:14
+
+WORKDIR /usr/src/app
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+
+RUN npm run build
+
+EXPOSE 3000
+
+# Use environment variables
+ENV NODE_ENV=production
+ENV DATABASE_URL=mongodb://localhost:27017/myapp
+
+CMD [ "node", "dist/main" ]
+```
+
+### 5. Using a Custom Start Script
+
+Use case: Using a custom script to start the application.
+
+```dockerfile
+FROM node:14
+
+WORKDIR /usr/src/app
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+
+RUN npm run build
+
+COPY start.sh ./
+RUN chmod +x start.sh
+
+EXPOSE 3000
+
+CMD [ "./start.sh" ]
+```
+
+### 6. Using a Non-root User
+
+Use case: Improving security by not running as root.
+
+```dockerfile
+FROM node:14
+
+# Create app directory
+WORKDIR /usr/src/app
+
+# Install app dependencies
+COPY package*.json ./
+RUN npm ci
+
+# Bundle app source
+COPY . .
+
+# Build the app
+RUN npm run build
+
+# Use a non-root user
+RUN useradd -m myuser
+USER myuser
+
+EXPOSE 3000
+
+CMD [ "node", "dist/main" ]
+```
+
+## Best Practices
+
+1. Use specific versions for base images (e.g., `node:14` instead of `node:latest`).
+2. Use multi-stage builds to keep final images small.
+3. Use `.dockerignore` to exclude unnecessary files.
+4. Run the application as a non-root user for improved security.
+5. Use environment variables for configuration.
+6. Optimize the layer caching by copying package.json first and installing dependencies before copying the rest of the app.
+
+Remember to adapt these examples to your specific NestJS application needs and structure.

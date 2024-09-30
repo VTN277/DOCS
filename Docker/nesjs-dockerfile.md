@@ -1,12 +1,14 @@
-# Dockerfile Guide for NestJS Applications
+# Dockerfile Cheat Sheet for NestJS Applications
+
+This cheat sheet provides examples and explanations for creating Dockerfiles for NestJS applications.
 
 ## Basic Dockerfile
 
 ```dockerfile
-# Use Node.js as the base image
+# Use an official Node runtime as the base image
 FROM node:18
 
-# Set working directory
+# Set the working directory in the container
 WORKDIR /usr/src/app
 
 # Copy package.json and package-lock.json
@@ -15,7 +17,7 @@ COPY package*.json ./
 # Install dependencies
 RUN npm install
 
-# Copy application source
+# Copy the rest of the application code
 COPY . .
 
 # Build the application
@@ -28,54 +30,17 @@ EXPOSE 3000
 CMD ["npm", "run", "start:prod"]
 ```
 
-## Explanation
+## Explanation:
+- `FROM node:18`: Uses Node.js 18 as the base image.
+- `WORKDIR /usr/src/app`: Sets the working directory inside the container.
+- `COPY package*.json ./`: Copies package.json and package-lock.json to optimize caching.
+- `RUN npm install`: Installs dependencies.
+- `COPY . .`: Copies the rest of the application code.
+- `RUN npm run build`: Builds the NestJS application.
+- `EXPOSE 3000`: Exposes port 3000 (default NestJS port).
+- `CMD ["npm", "run", "start:prod"]`: Starts the application in production mode.
 
-1. `FROM node:18`: Uses Node.js 18 as the base image.
-2. `WORKDIR /usr/src/app`: Sets the working directory inside the container.
-3. `COPY package*.json ./`: Copies package.json and package-lock.json to optimize caching.
-4. `RUN npm install`: Installs dependencies.
-5. `COPY . .`: Copies the rest of the application source.
-6. `RUN npm run build`: Builds the NestJS application.
-7. `EXPOSE 3000`: Exposes port 3000 (default NestJS port).
-8. `CMD ["npm", "run", "start:prod"]`: Starts the application in production mode.
-
-## Use Cases and Examples
-
-### 1. Development Environment
-
-For a development environment, you might want to use volumes and enable hot-reloading:
-
-```dockerfile
-FROM node:18
-
-WORKDIR /usr/src/app
-
-COPY package*.json ./
-
-RUN npm install
-
-COPY . .
-
-EXPOSE 3000
-
-CMD ["npm", "run", "start:dev"]
-```
-
-Use with docker-compose:
-
-```yaml
-version: '3'
-services:
-  app:
-    build: .
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
-    ports:
-      - "3000:3000"
-```
-
-### 2. Multi-stage Build for Smaller Production Image
+## Multi-Stage Build
 
 ```dockerfile
 # Build stage
@@ -84,11 +49,9 @@ FROM node:18 AS build
 WORKDIR /usr/src/app
 
 COPY package*.json ./
-
-RUN npm ci
+RUN npm install
 
 COPY . .
-
 RUN npm run build
 
 # Production stage
@@ -104,61 +67,13 @@ EXPOSE 3000
 CMD ["node", "dist/main"]
 ```
 
-This approach creates a smaller production image by only including necessary files.
+## Explanation:
+- Uses a multi-stage build to create a smaller production image.
+- The build stage compiles the TypeScript code.
+- The production stage uses a lightweight Alpine-based Node.js image.
+- Only the compiled code and production dependencies are copied to the final image.
 
-### 3. Including Environment Variables
-
-For applications that require environment variables:
-
-```dockerfile
-FROM node:18
-
-WORKDIR /usr/src/app
-
-COPY package*.json ./
-
-RUN npm install
-
-COPY . .
-
-RUN npm run build
-
-EXPOSE 3000
-
-# Use an env file
-COPY .env.production .env
-
-CMD ["npm", "run", "start:prod"]
-```
-
-### 4. Custom Node.js Version and NPM Version
-
-If you need specific versions:
-
-```dockerfile
-FROM node:18.15.0
-
-WORKDIR /usr/src/app
-
-# Install specific NPM version
-RUN npm install -g npm@8.19.3
-
-COPY package*.json ./
-
-RUN npm ci
-
-COPY . .
-
-RUN npm run build
-
-EXPOSE 3000
-
-CMD ["npm", "run", "start:prod"]
-```
-
-### 5. Including Additional Services
-
-For applications that require additional services like database migrations:
+## Development Dockerfile
 
 ```dockerfile
 FROM node:18
@@ -166,41 +81,23 @@ FROM node:18
 WORKDIR /usr/src/app
 
 COPY package*.json ./
-
 RUN npm install
 
 COPY . .
 
-RUN npm run build
-
 EXPOSE 3000
 
-# Add a script to run migrations and start the app
-COPY docker-entrypoint.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
-
-ENTRYPOINT ["docker-entrypoint.sh"]
+CMD ["npm", "run", "start:dev"]
 ```
 
-With a `docker-entrypoint.sh`:
+## Explanation:
+- Similar to the basic Dockerfile, but doesn't build the app.
+- Uses `npm run start:dev` to run the app in development mode with hot-reloading.
 
-```bash
-#!/bin/sh
-set -e
+## Tips:
+1. Use `.dockerignore` to exclude unnecessary files (e.g., node_modules, .git).
+2. Consider using environment variables for configuration.
+3. For production, use multi-stage builds to reduce image size.
+4. Use Docker Compose for managing multi-container NestJS applications.
 
-npm run migration:run
-npm run start:prod
-```
-
-This setup allows you to run database migrations before starting the application.
-
-## Best Practices
-
-1. Use `.dockerignore` to exclude unnecessary files.
-2. Leverage build cache by ordering Dockerfile instructions from least to most frequently changing.
-3. Use multi-stage builds for production to reduce image size.
-4. Specify exact versions of Node.js and npm for consistency.
-5. Don't run the application as root; use `USER node` if possible.
-6. Set NODE_ENV to "production" to optimize performance.
-
-By following these practices and examples, you can create efficient Dockerfiles for various NestJS application scenarios.
+Remember to adjust the Dockerfile based on your specific NestJS application structure and requirements.

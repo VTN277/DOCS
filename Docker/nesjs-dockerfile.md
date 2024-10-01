@@ -1,389 +1,163 @@
-# Dockerfile Guide for NestJS
+# Dockerfile Guide for NestJS Applications
 
 ## Basic Dockerfile
 
+Here's a basic Dockerfile for a NestJS application:
+
 ```dockerfile
-# Use Node.js as the base image
-FROM node:14
+# Build stage
+FROM node:18-alpine AS build
 
-# Set working directory
-WORKDIR /usr/src/app
+WORKDIR /app
 
-# Copy package.json and package-lock.json
 COPY package*.json ./
+RUN npm ci
 
-# Install dependencies
-RUN npm install
-
-# Copy application source
 COPY . .
-
-# Build the application
 RUN npm run build
 
-# Expose port
-EXPOSE 3000
+# Production stage
+FROM node:18-alpine
 
-# Start the application
-CMD ["npm", "run", "start:prod"]
+WORKDIR /app
+
+COPY --from=build /app/dist ./dist
+COPY --from=build /app/node_modules ./node_modules
+COPY package*.json ./
+
+EXPOSE 3000
+CMD ["node", "dist/main"]
 ```
 
 ## Use Cases and Examples
 
-1. Development Environment
+### 1. Development Environment
+
+For development, you might want to use a different Dockerfile:
 
 ```dockerfile
-FROM node:14
+FROM node:18-alpine
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
 COPY package*.json ./
-
 RUN npm install
 
 COPY . .
 
 EXPOSE 3000
-
 CMD ["npm", "run", "start:dev"]
 ```
 
-Use case: Provides a consistent development environment across team members.
+### 2. Using Docker Compose
 
-2. Production Deployment
-
-```dockerfile
-FROM node:14-alpine as builder
-
-WORKDIR /usr/src/app
-
-COPY package*.json ./
-
-RUN npm ci
-
-COPY . .
-
-RUN npm run build
-
-FROM node:14-alpine
-
-WORKDIR /usr/src/app
-
-COPY --from=builder /usr/src/app/dist ./dist
-COPY --from=builder /usr/src/app/node_modules ./node_modules
-
-EXPOSE 3000
-
-CMD ["node", "dist/main"]
-```
-
-Use case: Optimized for production deployment with a smaller image size.
-
-3. Multi-stage Build with Test
-
-```dockerfile
-FROM node:14 as builder
-
-WORKDIR /usr/src/app
-
-COPY package*.json ./
-
-RUN npm ci
-
-COPY . .
-
-RUN npm run build
-
-FROM node:14 as tester
-
-WORKDIR /usr/src/app
-
-COPY --from=builder /usr/src/app .
-
-RUN npm run test
-
-FROM node:14-alpine
-
-WORKDIR /usr/src/app
-
-COPY --from=builder /usr/src/app/dist ./dist
-COPY --from=builder /usr/src/app/node_modules ./node_modules
-
-EXPOSE 3000
-
-CMD ["node", "dist/main"]
-```
-
-Use case: Includes a testing stage to ensure code quality before deployment.
-
-4. Development with Hot Reload
-
-```dockerfile
-FROM node:14
-
-WORKDIR /usr/src/app
-
-COPY package*.json ./
-
-RUN npm install
-
-COPY . .
-
-EXPOSE 3000
-
-CMD ["npm", "run", "start:dev"]
-```
-
-Use case: Enables hot reloading for faster development iterations.
-
-5. Production with Environment Variables
-
-```dockerfile
-FROM node:14-alpine
-
-WORKDIR /usr/src/app
-
-COPY package*.json ./
-
-RUN npm ci --only=production
-
-COPY . .
-
-RUN npm run build
-
-EXPOSE 3000
-
-CMD ["node", "dist/main"]
-```
-
-Use with docker-compose.yml:
+Create a `docker-compose.yml` file for local development:
 
 ```yaml
-version: '3'
+version: '3.8'
 services:
   app:
-    build: .
-    environment:
-      - DATABASE_URL=postgres://user:password@db:5432/dbname
-    ports:
-      - "3000:3000"
-    depends_on:
-      - db
-  db:
-    image: postgres
-```
-
-Use case: Configures the application with environment-specific settings.
-6. Using Environment Variables for Configuration
-
-```dockerfile
-FROM node:14-alpine
-
-WORKDIR /usr/src/app
-
-COPY package*.json ./
-
-RUN npm ci --only=production
-
-COPY . .
-
-RUN npm run build
-
-EXPOSE 3000
-
-# Use environment variables for configuration
-ENV NODE_ENV=production
-ENV DATABASE_URL=postgres://user:password@db:5432/dbname
-ENV REDIS_URL=redis://redis:6379
-
-CMD ["node", "dist/main"]
-```
-
-Use case: Allows for flexible configuration across different environments without changing the Docker image.
-
-7. Multi-stage Build with TypeORM Migrations
-
-```dockerfile
-FROM node:14-alpine as builder
-
-WORKDIR /usr/src/app
-
-COPY package*.json ./
-
-RUN npm ci
-
-COPY . .
-
-RUN npm run build
-
-FROM node:14-alpine
-
-WORKDIR /usr/src/app
-
-COPY --from=builder /usr/src/app/dist ./dist
-COPY --from=builder /usr/src/app/node_modules ./node_modules
-COPY --from=builder /usr/src/app/ormconfig.json ./
-
-# Add script to run migrations and start the app
-COPY start-with-migrations.sh ./
-RUN chmod +x start-with-migrations.sh
-
-EXPOSE 3000
-
-CMD ["./start-with-migrations.sh"]
-```
-
-```bash
-#!/bin/sh
-# start-with-migrations.sh
-set -e
-
-echo "Running database migrations..."
-npx typeorm migration:run
-
-echo "Starting the application..."
-node dist/main
-```
-
-Use case: Ensures database schema is up-to-date before starting the application.
-
-8 Using Docker Secrets
-
-```dockerfile
-FROM node:14-alpine
-
-WORKDIR /usr/src/app
-
-COPY package*.json ./
-
-RUN npm ci --only=production
-
-COPY . .
-
-RUN npm run build
-
-EXPOSE 3000
-
-# Use Docker secrets for sensitive information
-CMD ["node", "dist/main.js", "--db-password-file", "/run/secrets/db-password"]
-```
-
-Use with docker-compose.yml:
-
-```yaml
-version: '3.7'
-services:
-  app:
-    build: .
-    secrets:
-      - db-password
-    environment:
-      - NODE_ENV=production
-      - DATABASE_URL=postgres://user:@db:5432/dbname
-    ports:
-      - "3000:3000"
-  db:
-    image: postgres
-    secrets:
-      - db-password
-    environment:
-      POSTGRES_PASSWORD_FILE: /run/secrets/db-password
-
-secrets:
-  db-password:
-    file: ./db-password.txt
-```
-
-Use case: Securely manages sensitive information like database passwords.
-
-9. Multi-stage Build with Tests and Code Coverage
-
-```dockerfile
-FROM node:14 as builder
-
-WORKDIR /usr/src/app
-
-COPY package*.json ./
-
-RUN npm ci
-
-COPY . .
-
-RUN npm run build
-
-FROM node:14 as tester
-
-WORKDIR /usr/src/app
-
-COPY --from=builder /usr/src/app .
-
-RUN npm run test
-RUN npm run test:cov
-
-FROM node:14-alpine
-
-WORKDIR /usr/src/app
-
-COPY --from=builder /usr/src/app/dist ./dist
-COPY --from=builder /usr/src/app/node_modules ./node_modules
-COPY --from=tester /usr/src/app/coverage ./coverage
-
-EXPOSE 3000
-
-CMD ["node", "dist/main"]
-```
-
-Use case: Runs tests and generates code coverage reports as part of the build process.
-
-10. Development Environment with Debugging
-
-```dockerfile
-FROM node:14
-
-WORKDIR /usr/src/app
-
-COPY package*.json ./
-
-RUN npm install
-
-COPY . .
-
-EXPOSE 3000 9229
-
-CMD ["npm", "run", "start:debug"]
-```
-
-Use with docker-compose.yml:
-
-```yaml
-version: '3'
-services:
-  app:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
     volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
+      - .:/app
+      - /app/node_modules
     ports:
       - "3000:3000"
-      - "9229:9229"
     environment:
       - NODE_ENV=development
-    command: npm run start:debug
 ```
 
-Use case: Enables debugging capabilities in a dockerized development environment.
+### 3. Multi-stage Build with Testing
 
-## Best Practices for Environment-Specific Configurations
+Include testing in your build process:
 
-1. Use environment variables for configuration that changes between environments.
-2. Store sensitive information in Docker secrets or secure environment management tools.
-3. Use different Docker Compose files for development, testing, and production environments.
-4. Implement health checks to ensure services are ready before the application starts.
-5. Use multi-stage builds to separate concerns (building, testing, production runtime).
-6. Implement logging strategies that work well with containerized environments (e.g., logging to stdout/stderr).
-7. Consider using init systems like dumb-init to handle signal forwarding and zombie process reaping.
-8. Use `.dockerignore` to exclude environment-specific files that shouldn't be in the image.
-9. Implement proper error handling and graceful shutdowns to work well with container orchestration systems.
-10. Use CI/CD pipelines to automate building and testing Docker images for different environments.
+```dockerfile
+# Build stage
+FROM node:18-alpine AS build
 
-By implementing these practices and using the provided examples, you can create flexible, secure, and efficient Dockerfiles for your NestJS applications that work seamlessly across different environments.
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci
+
+COPY . .
+RUN npm run build
+
+# Test stage
+FROM build AS test
+RUN npm run test
+
+# Production stage
+FROM node:18-alpine
+
+WORKDIR /app
+
+COPY --from=build /app/dist ./dist
+COPY --from=build /app/node_modules ./node_modules
+COPY package*.json ./
+
+EXPOSE 3000
+CMD ["node", "dist/main"]
+```
+
+### 4. Using Environment Variables
+
+Utilize environment variables for configuration:
+
+```dockerfile
+# ... (previous stages)
+
+FROM node:18-alpine
+
+WORKDIR /app
+
+COPY --from=build /app/dist ./dist
+COPY --from=build /app/node_modules ./node_modules
+COPY package*.json ./
+
+EXPOSE 3000
+
+ENV NODE_ENV=production
+ENV DATABASE_URL=postgres://user:password@host:5432/db
+
+CMD ["node", "dist/main"]
+```
+
+### 5. Health Check
+
+Add a health check to your Dockerfile:
+
+```dockerfile
+# ... (previous stages)
+
+FROM node:18-alpine
+
+WORKDIR /app
+
+COPY --from=build /app/dist ./dist
+COPY --from=build /app/node_modules ./node_modules
+COPY package*.json ./
+
+EXPOSE 3000
+
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:3000/health || exit 1
+
+CMD ["node", "dist/main"]
+```
+
+Remember to implement a `/health` endpoint in your NestJS application.
+
+## Best Practices
+
+1. Use multi-stage builds to keep the final image small
+2. Utilize `.dockerignore` to exclude unnecessary files
+3. Run the application as a non-root user for security
+4. Use specific versions for base images
+5. Optimize caching by copying package.json files first
+6. Set appropriate environment variables
+7. Implement health checks for container orchestration
+
+By following these practices and examples, you can create efficient and secure Dockerfiles for your NestJS applications.

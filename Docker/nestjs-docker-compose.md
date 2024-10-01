@@ -1,142 +1,234 @@
-# Docker Compose Cheat Sheet for NestJS Applications
+# Concise Guide to Docker Compose in NestJS
 
-This cheat sheet provides examples and explanations for using Docker Compose with NestJS applications.
+## 1. Basic Docker Compose Commands
 
-## Basic docker-compose.yml
+```bash
+docker-compose up         # Start containers
+docker-compose up -d      # Start in detached mode
+docker-compose down       # Stop and remove containers
+docker-compose logs       # View logs
+docker-compose build      # Rebuild containers
+docker-compose ps         # List containers
+docker-compose exec <service> <command>  # Run command in container
+```
+
+## 2. Docker Compose File Structure
+
+Basic `docker-compose.yml` for NestJS:
 
 ```yaml
 version: '3.8'
+
 services:
-  nestjs-app:
+  app:
     build: .
     ports:
       - "3000:3000"
     environment:
       - NODE_ENV=production
-```
-
-### Explanation:
-- `version: '3.8'`: Specifies the Docker Compose file version.
-- `services`: Defines the services (containers) in your application.
-- `nestjs-app`: The name of your NestJS service.
-- `build: .`: Builds the image using the Dockerfile in the current directory.
-- `ports`: Maps port 3000 on the host to port 3000 in the container.
-- `environment`: Sets environment variables.
-
-## Development Environment
-
-```yaml
-version: '3.8'
-services:
-  nestjs-app:
-    build:
-      context: .
-      dockerfile: Dockerfile.dev
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
-    ports:
-      - "3000:3000"
-    environment:
-      - NODE_ENV=development
-    command: npm run start:dev
-```
-
-### Explanation:
-- `build`: Specifies a custom Dockerfile for development.
-- `volumes`: Mounts the current directory to `/usr/src/app` in the container for live code reloading.
-- `command`: Overrides the CMD in the Dockerfile to run in development mode.
-
-## With Database (PostgreSQL)
-
-```yaml
-version: '3.8'
-services:
-  nestjs-app:
-    build: .
-    ports:
-      - "3000:3000"
-    environment:
-      - NODE_ENV=production
-      - DB_HOST=postgres
-      - DB_PORT=5432
-      - DB_USERNAME=user
-      - DB_PASSWORD=password
-      - DB_DATABASE=mydb
     depends_on:
-      - postgres
+      - db
 
-  postgres:
+  db:
     image: postgres:13
     environment:
-      - POSTGRES_USER=user
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=mydb
+      POSTGRES_DB: nestjs
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data
 
 volumes:
-  postgres_data:
+  pgdata:
 ```
 
-### Explanation:
-- Adds a PostgreSQL service to the composition.
-- `depends_on`: Ensures the database starts before the NestJS app.
-- `volumes`: Creates a named volume for persistent database storage.
+## 3. Use Cases and Examples
 
-## With Redis for Caching
+### Development Environment
+
+`docker-compose.dev.yml`:
 
 ```yaml
 version: '3.8'
+
 services:
-  nestjs-app:
-    build: .
-    ports:
-      - "3000:3000"
-    environment:
-      - NODE_ENV=production
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-    depends_on:
-      - redis
-
-  redis:
-    image: redis:6-alpine
-```
-
-### Explanation:
-- Adds a Redis service for caching or session storage.
-- Uses the lightweight Alpine-based Redis image.
-
-## Development Environment with Hot Reload
-
-```yaml
-version: '3.8'
-services:
-  nestjs-app:
+  app:
     build:
       context: .
       dockerfile: Dockerfile.dev
     volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
+      - ./src:/app/src
+    command: npm run start:dev
     ports:
       - "3000:3000"
-      - "9229:9229"
+      - "9229:9229"  # For debugging
     environment:
       - NODE_ENV=development
-    command: npm run start:debug
+
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: nestjs_dev
+      POSTGRES_USER: dev_user
+      POSTGRES_PASSWORD: dev_password
+    ports:
+      - "5432:5432"
+
+volumes:
+  pgdata:
 ```
 
-### Explanation:
-- Maps port 9229 for Node.js debugging.
-- Uses `npm run start:debug` for hot reloading and debugging support.
+Run with: `docker-compose -f docker-compose.dev.yml up`
 
-## Tips:
-1. Use environment variables or `.env` files for sensitive information.
-2. Create separate compose files for different environments (e.g., `docker-compose.prod.yml`).
-3. Use `docker-compose up --build` to rebuild images when Dockerfile changes.
-4. For production, consider using Docker Swarm or Kubernetes for orchestration.
-5. Use `healthcheck` to ensure services are ready before depending on them.
+### Production Environment
 
-Remember to adjust the Docker Compose configurations based on your specific NestJS application requirements and architecture.
+`docker-compose.prod.yml`:
+
+```yaml
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    depends_on:
+      - db
+    deploy:
+      replicas: 3
+
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+
+volumes:
+  pgdata:
+```
+
+Run with: `docker-compose -f docker-compose.prod.yml up -d`
+
+### Microservices Architecture
+
+`docker-compose.microservices.yml`:
+
+```yaml
+version: '3.8'
+
+services:
+  gateway:
+    build: ./gateway
+    ports:
+      - "3000:3000"
+    depends_on:
+      - users
+      - auth
+
+  users:
+    build: ./users-service
+    environment:
+      - DB_HOST=users-db
+
+  auth:
+    build: ./auth-service
+    environment:
+      - DB_HOST=auth-db
+
+  users-db:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: users
+
+  auth-db:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: auth
+
+  redis:
+    image: redis:6
+
+networks:
+  default:
+    name: nestjs-network
+```
+
+Run with: `docker-compose -f docker-compose.microservices.yml up`
+
+## 4. Best Practices
+
+1. Use multi-stage builds in Dockerfiles
+2. Store secrets in `.env` files (gitignored)
+3. Use health checks for services
+4. Separate dev and prod configurations
+5. Use Docker networks for service isolation
+6. Leverage Docker volumes for persistent data
+
+## 5. Debugging
+
+For debugging, add these to your `app` service:
+
+```yaml
+ports:
+  - "9229:9229"
+command: npm run start:debug
+```
+
+Then connect your IDE to localhost:9229.
+
+## 6. Testing
+
+For running tests in Docker:
+
+```yaml
+services:
+  test:
+    build: .
+    command: npm run test
+    environment:
+      - NODE_ENV=test
+```
+
+Run with: `docker-compose run test`
+
+## 7. Continuous Integration
+
+Example `.gitlab-ci.yml` snippet:
+
+```yaml
+stages:
+  - build
+  - test
+  - deploy
+
+build:
+  stage: build
+  script:
+    - docker-compose build
+
+test:
+  stage: test
+  script:
+    - docker-compose run test
+
+deploy:
+  stage: deploy
+  script:
+    - docker-compose -f docker-compose.prod.yml up -d
+```
+
+This concise guide covers the essentials of using Docker Compose with NestJS, including common commands, file structure, and practical examples for different scenarios. It also touches on best practices, debugging, testing, and CI integration.

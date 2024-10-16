@@ -1,0 +1,173 @@
+## What is S3?
+- Simple Storage Service
+- Use cases: data lakes, websites, mobile apps, backup & restore, archiving, enterprise apps, IoT, Big Data & Analytics
+
+## Key Features of S3
+- Managed Service (no infrastructure management)
+- Object storage (0 - 5TB per file)
+- High Durability (11 9s), Scalability, High Availability (99.99%)
+- Versatile use cases
+- Multiple storage classes for cost optimization
+- Granular access control
+- Easy integration with other AWS services
+
+## S3 Core Features
+1. Storage classes
+2. Storage management (Life Cycle, Object Lock, Replication, Batch Operation)
+3. Access Management
+4. Data processing
+5. Auto Logging and Monitoring
+6. Analytics and insights
+7. Strong consistency for read-after-write operations
+
+## S3 Integration with AWS Services
+- EC2, Containers, Lambda for file storage
+- Log storage for AWS services
+- Data source for big data & data warehouse
+- IoT device data storage
+- ETL processes with Lambda
+- Static website hosting with CloudFront
+
+## Lab 1: S3 Basic Operations
+1. AWS console login and S3 navigation
+2. Bucket creation
+3. Folder creation
+4. File/folder upload
+5. File moving
+6. File download
+7. Object metadata editing
+8. File deletion
+
+## S3 Bucket Policy and Access Control List
+- Resource Level Policy support
+- Similar to IAM Policy but bucket-scoped
+- Controls access (allow/deny) to bucket and its contents
+- Suitable for high-security requirements
+
+### Bucket Policy Examples
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "Allow_riccardo_read",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": ["arn:aws:iam::614073292094:user/riccardo"]
+      },
+      "Action": ["s3:GetObject"],
+      "Resource": "arn:aws:s3:::abc-bucket-sample-001/*"
+    }
+  ]
+}
+```
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "Deny_ronaldo_all",
+      "Effect": "Deny",
+      "Principal": {
+        "AWS": ["arn:aws:iam::614073292094:user/ronaldo"]
+      },
+      "Action": ["s3:*"],
+      "Resource": "arn:aws:s3:::abc-bucket-sample-001/*"
+    }
+  ]
+}
+```
+
+## Access Control List (ACL)
+- Specifies access rights for AWS Accounts or user groups
+- Used for specific resource access without changing bucket policy
+- AWS recommends using bucket policy, IAM policy & pre-signed URLs instead of ACL
+
+## Lab 2: S3 Access Control List
+1. File upload
+2. Public access modification
+3. Access testing without login
+
+## S3 Versioning
+- Stores multiple versions of objects
+- Prevents accidental deletions or overwrites
+- Increases storage costs
+- Version history persists after disabling
+
+## Lab 3: Versioning
+1. File preparation
+2. Versioning activation
+3. File upload and version creation
+4. File deletion and restoration
+5. Versioning deactivation and behavior testing
+
+## S3 Presigned URL
+- Temporary public access to S3 objects
+- Time-limited download/upload permissions
+- Use cases: temporary access, user authentication, preventing indefinite public access
+
+## Lab 4: Presigned URL (CLI)
+1. AWS CLI setup
+2. File upload to S3
+3. Presigned URL generation
+4. URL testing
+5. Expiration verification
+
+## S3 Storage Classes
+- Multiple classes for cost optimization
+- Selection factors: durability, availability, storage duration, access frequency, use case
+
+### Storage Class Types
+1. S3 Standard
+2. S3 Intelligent Tiering
+3. S3 Standard Infrequent Access (IA)
+4. S3 One Zone-IA
+5. S3 Glacier Instant Retrieval
+6. S3 Glacier Flexible Retrieval
+7. S3 Glacier Deep Archive
+8. S3 Outposts
+
+## Lab 5: Storage Class Practice
+1. File uploads with different storage classes
+2. Access testing for Glacier Deep Archive
+3. File cleanup
+
+## S3 Lifecycle Management
+- Automatic object transition between storage classes
+- Deletion after specified time
+- Useful for log storage optimization
+
+## Lab 6: S3 Static Website Hosting
+1. Static HTML source preparation
+2. S3 upload
+3. Static web hosting activation
+4. Public access configuration
+5. Bucket policy setup
+6. Browser access testing
+
+## S3 Event Triggers
+- Event notification on object changes
+- Integration with Lambda, SNS, SQS
+- Use cases: image resizing, file unzipping, data processing, deletion notifications
+
+## Lab 7: S3 Event with Lambda Integration
+1. Simple Lambda function creation
+2. S3 trigger setup
+3. Upload testing
+4. Lambda execution verification
+
+## S3 Best Practices
+- Region alignment with applications
+- Bucket policy for important data
+- Versioning for data protection
+- Data encryption
+- TLS enforcement
+- VPC endpoint usage
+- CloudFront integration for static web hosting
+
+## Resource Cleanup
+1. S3 bucket deletion
+2. EC2 instance termination
+3. Lambda function retention (optional)
+

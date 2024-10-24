@@ -1,22 +1,13 @@
-100 AWS DevOps Interview Questions and Answers \# aws \# devops \#
-interview \# beginners Table of Contents General AWS DevOps Questions
-CI/CD Pipeline Questions Containerization and Orchestration AWS Elastic
-Beanstalk and Lambda AWS EC2 and Load Balancing AWS CloudFormation and
-Automation AWS Monitoring and Logging AWS IAM and Security Version
-Control and AWS CodeCommit AWS Auto Scaling AWS S3 and Storage AWS
-Networking AWS Elastic Container Service (ECS) AWS Elastic Kubernetes
-Service (EKS) AWS Lambda and Serverless AWS Monitoring and
-Troubleshooting AWS Elastic Load Balancer (ELB) AWS Elastic Block Store
-(EBS) and Databases General AWS DevOps Questions
+## General AWS DevOps Questions
 
-What is DevOps?
+### What is DevOps?
 
 DevOps is a set of practices that integrates software development (Dev)
 and IT operations (Ops) to shorten the development lifecycle and deliver
 features, fixes, and updates frequently in close alignment with business
 objectives.
 
-What are the benefits of using AWS for DevOps?
+### What are the benefits of using AWS for DevOps?
 
 AWS provides flexible services like Elastic Compute Cloud (EC2), Elastic
 Container Service (ECS), and Elastic Beanstalk, which help automate and
@@ -24,7 +15,7 @@ scale development and deployment pipelines. Features include
 scalability, automation, CI/CD, Infrastructure as Code (IaC), and
 monitoring tools.
 
-What is Infrastructure as Code (IaC) in AWS?
+### What is Infrastructure as Code (IaC) in AWS?
 
 IaC refers to managing and provisioning infrastructure through code
 instead of manual processes. In AWS, you can implement IaC using AWS
